@@ -88,6 +88,28 @@ app.patch('/todos/:id',(req,res)=>{
     });
 });
 
+//Users route.
+app.post('/users',(req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    var user = new User(body);
+
+    user.save()
+    .then(()=>{
+         return user.generateAuthToken();
+        //res.send(user);
+    })
+    .then((token)=>{
+        // when we prefix a header with x-something
+        // it becomes a custom header(may not be supported by http)
+        // only for internal use.
+        res.header('x-auth',token).send(user);
+    })
+    .catch((e)=>{
+        res.status(400).send(e);
+    });
+});
+
+//start server
 app.listen(port,()=>{
     console.log('Server started on port: ', port);
 });
